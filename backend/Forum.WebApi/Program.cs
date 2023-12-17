@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using Forum.Common.Options;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Options;
-using Constants = Forum.Common.Constants;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +14,27 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddHttpClient();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie()
+    .AddGoogle(options =>
+    {
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+        options.ClientSecret = builder.Configuration["GoogleOAuthOptions:ClientSecret"]!;
+        options.ClientId = builder.Configuration["GoogleOAuthOptions:ClientId"]!;
+
+        options.Scope.Add("email");
+        options.Scope.Add("profile");
+        options.Scope.Add("openid");
+
+        options.SaveTokens = true;
+        
+        options.ClaimActions.Clear();
+        options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
+        options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+        options.ClaimActions.MapJsonKey("picture", "picture");
+        options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+    });
 
 var app = builder.Build();
 
@@ -28,47 +50,29 @@ else
 
 app.UseHttpsRedirection();
 
-app.MapGet("/auth", (HttpContext context, IOptions<GoogleOAuthOptions> _options) =>
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.MapGet("/", (HttpContext context) =>
 {
-    var redirectUri = $"https://{context.Request.Host}/auth/code";
-
-    var queryParams = new Dictionary<string, string>()
-    {
-        { "client_id", _options.Value.ClientId },
-        { "redirect_uri", redirectUri },
-        { "response_type", "code " },
-        { "scope", "profile" },
-        { "access_type", "offline" }
-    };
-
-    var url = QueryHelpers.AddQueryString(Constants.AuthUri, queryParams!);
-    return Results.Redirect(url);
+    context.GetTokenAsync("access_token");
+    return context.User.Claims.Select(x => new { x.Type, x.Value }).ToList();
 });
 
-
-app.MapGet("/auth/code", async (HttpContext context,
-    string code, 
-    HttpClient httpClient,
-    IOptions<GoogleOAuthOptions> _options) =>
+app.MapGet("/login", () => Results.Challenge(new GoogleChallengeProperties()
 {
-    var redirectUri = $"https://{context.Request.Host}/auth/code";
+    RedirectUri = "/"
+},new List<string> { GoogleDefaults.AuthenticationScheme }));
 
-    var queryParams = new Dictionary<string, string>()
-    {
-        { "client_id", _options.Value.ClientId },
-        { "client_secret", _options.Value.ClientSecret },
-        { "code", code },
-        { "grant_type", "authorization_code" },
-        { "redirect_uri", redirectUri }
-    };
+app.MapGet("/logout", () => Results.SignOut(new AuthenticationProperties()
+{
+    RedirectUri = "/"
+},new List<string> { CookieAuthenticationDefaults.AuthenticationScheme }));
 
-    var url = QueryHelpers.AddQueryString(Constants.TokenUri, queryParams!);
-    var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, url);
-
-    var response = await httpClient.SendAsync(httpRequestMessage);
-    var json = await response.Content.ReadFromJsonAsync<object>();
-
-    return json;
-});
+app.MapGet("/authtest", [Authorize]() => "Authorized");
 
 app.Run();
