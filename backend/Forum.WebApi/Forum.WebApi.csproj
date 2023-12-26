@@ -4,7 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <InvariantGlobalization>true</InvariantGlobalization>
+        <InvariantGlobalization>false</InvariantGlobalization>
         <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
       <UserSecretsId>388bed01-29da-4b6a-964f-98908f687f21</UserSecretsId>
   </PropertyGroup>
@@ -12,6 +12,10 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     </ItemGroup>
 
@@ -23,6 +27,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Forum.Common\Forum.Common.csproj" />
+      <ProjectReference Include="..\Forum.Infrastructure\Forum.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
