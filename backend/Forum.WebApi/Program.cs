@@ -13,21 +13,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<GoogleOAuthOptions>(
     builder.Configuration.GetSection(nameof(GoogleOAuthOptions)));
 
+builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<ForumDbContext>();
+
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<ForumDbContext>()
-    .AddDefaultTokenProviders();
-
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-    })
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie()
     .AddGoogle(options =>
     {
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
         options.ClientSecret = builder.Configuration["GoogleOAuthOptions:ClientSecret"]!;
         options.ClientId = builder.Configuration["GoogleOAuthOptions:ClientId"]!;
 
@@ -35,19 +35,14 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("profile");
         options.Scope.Add("openid");
 
-        //options.SaveTokens = true;
+        options.SaveTokens = true;
         
         options.ClaimActions.Clear();
+        options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
         options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
         options.ClaimActions.MapJsonKey("picture", "picture");
         options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
-        
-        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; 
     });
-
-builder.Services.AddAuthorization();
-
-builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
@@ -68,26 +63,22 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", (HttpContext context, string returnUrl = "") =>
+app.MapControllers();
+
+app.MapGet("/", (HttpContext context) =>
 {
-    Console.WriteLine(returnUrl);
     return context.User.Claims.Select(x => new { x.Type, x.Value }).ToList();
 });
 
 app.MapGet("/login", () => Results.Challenge(new GoogleChallengeProperties()
 {
-    RedirectUri = "/",
+    RedirectUri = "/"
 },new List<string> { GoogleDefaults.AuthenticationScheme }));
 
 app.MapGet("/logout", () => Results.SignOut(new AuthenticationProperties()
 {
     RedirectUri = "/"
 },new List<string> { CookieAuthenticationDefaults.AuthenticationScheme }));
-
-app.MapGet("/test", (ForumDbContext context) =>
-{
-    return context.Users;
-});
 
 app.MapGet("/authtest", [Authorize]() => "Authorized");
 
