@@ -5,4 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Infrastructure;
 
-public class ForumDbContext(DbContextOptions options) : IdentityDbContext<User>(options);
+public class ForumDbContext(DbContextOptions options) : DbContext(options)
+{
+    public DbSet<User> Users { get; set; } = null!;
+}

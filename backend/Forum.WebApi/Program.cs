@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,22 +15,20 @@ builder.Services.Configure<GoogleOAuthOptions>(
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<ForumDbContext>();
-
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    })
     .AddCookie()
     .AddGoogle(options =>
     {
-        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-
         options.ClientSecret = builder.Configuration["GoogleOAuthOptions:ClientSecret"]!;
         options.ClientId = builder.Configuration["GoogleOAuthOptions:ClientId"]!;
-
+        
         options.Scope.Add("email");
         options.Scope.Add("profile");
         options.Scope.Add("openid");
@@ -43,6 +41,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ClaimActions.MapJsonKey("picture", "picture");
         options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
     });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -58,28 +58,45 @@ else
 
 app.UseHttpsRedirection();
 
-app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapGet("/", (HttpContext context) => context.User.Claims.Select(x => new { x.Type, x.Value }));
 
-app.MapGet("/", (HttpContext context) =>
+app.MapGet("/finish-auth", async (HttpContext context, ForumDbContext forumDbContext) =>
 {
-    return context.User.Claims.Select(x => new { x.Type, x.Value }).ToList();
+    var claims = context.User.Claims.ToDictionary(x => x.Type, x => x.Value);
+
+    var email = claims[ClaimTypes.Email];
+
+    var user = await forumDbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+    if (user is null)
+    {
+        user = new User()
+        {
+            Sub = claims[ClaimTypes.NameIdentifier],
+            Name = claims[ClaimTypes.Name],
+            Picture = claims["picture"],
+            Email = email,
+        };
+
+        await forumDbContext.Users.AddAsync(user);
+        await forumDbContext.SaveChangesAsync();
+    }
 });
 
-app.MapGet("/login", () => Results.Challenge(new GoogleChallengeProperties()
+app.MapGet("/test", (ForumDbContext context) =>
 {
-    RedirectUri = "/"
-},new List<string> { GoogleDefaults.AuthenticationScheme }));
+    var result = context.Users;
+    return result;
+});
 
-app.MapGet("/logout", () => Results.SignOut(new AuthenticationProperties()
-{
-    RedirectUri = "/"
-},new List<string> { CookieAuthenticationDefaults.AuthenticationScheme }));
+app.MapGet("/login", () => Results.Challenge(new()
+    {
+        RedirectUri = "/finish-auth"
+    }, [GoogleDefaults.AuthenticationScheme]));
 
-app.MapGet("/authtest", [Authorize]() => "Authorized");
+app.MapGet("/authtest", [Authorize](HttpContext context) => context.User.Claims.Select(x => new { x.Type, x.Value }).ToList());
 
 app.Run();
