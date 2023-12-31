@@ -1,10 +1,9 @@
 
+using Microsoft.AspNetCore.Identity;
+
 namespace Forum.Domain.Entities;
 
-public class User
+public class User : IdentityUser
 {
-    public string Sub { get; set; } = null!;
-    public string Name { get; set; } = null!;
-    public string Picture { get; set; } = null!;
-    public string Email { get; set; } = null!;
+    public DateTime JoinedAt { get; set; }
 }
