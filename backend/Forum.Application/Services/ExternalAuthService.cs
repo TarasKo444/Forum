@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Forum.Common;
 using Forum.Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -26,13 +27,10 @@ public class ExternalAuthService(
     {
         var info = await _signInManager.GetExternalLoginInfoAsync();
 
-        if (info is null)
-        {
-            throw new NullReferenceException(nameof(info));    
-        }
+        Throw.ApiExceptionIfNull(info, 401, new("external login failed"));
         
         var result = await _signInManager.ExternalLoginSignInAsync(
-            info.LoginProvider, info.ProviderKey, false, true);
+            info!.LoginProvider, info.ProviderKey, false, true);
 
         if (!result.Succeeded)
         {
@@ -47,11 +45,9 @@ public class ExternalAuthService(
 
             var userResult = await _signInManager.UserManager.AddLoginAsync(user, info);
             
-            if (!userResult.Succeeded)
-            {
-                throw new InvalidOperationException(userResult.ToString());
-            }
-            
+            Throw.ApiExceptionIf(!userResult.Succeeded,
+                401, userResult.Errors.Select(e => new ApiError(e.Description)));
+
             await _signInManager.UserManager.AddClaimAsync(user, info.Principal.FindFirst("picture")!);
 
             await _signInManager.SignInAsync(user, isPersistent: false);

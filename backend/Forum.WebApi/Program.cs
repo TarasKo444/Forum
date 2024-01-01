@@ -5,6 +5,7 @@ using Forum.WebApi;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Forum.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,11 +28,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/api/auth/login";
 });
 
-builder.Services.AddAuthentication(IdentityConstants.ExternalScheme)
+builder.Services.AddAuthentication()
     .AddGoogle(options =>
     {
         options.ClientId = builder.Configuration["GoogleOAuthOptions:ClientId"]!;
         options.ClientSecret = builder.Configuration["GoogleOAuthOptions:ClientSecret"]!;
+        options.SignInScheme = IdentityConstants.ExternalScheme;
         options.ClaimActions.MapJsonKey("picture", "picture");
     });
 
@@ -51,6 +53,8 @@ else
 
 app.UseHttpsRedirection();
 
+app.UseCustomExceptionHandler();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -62,6 +66,11 @@ api.MapGet("/auth/test", [Authorize] (HttpContext context) =>
     return context.User.Claims.Select(x => new { x.Type, x.Value });
 });
 
+api.MapGet("/auth/test2", (ForumDbContext context) =>
+{
+    return context.Users.ToList();
+});
+
 api.MapGet("/auth/test3", async (ForumDbContext context) =>
 {
     var users = context.Users.ToList(); 
@@ -69,9 +78,19 @@ api.MapGet("/auth/test3", async (ForumDbContext context) =>
     await context.SaveChangesAsync();
 });
 
-api.MapGet("/auth/test2", (ForumDbContext context) =>
+api.MapGet("/auth/test4", () => 
 {
-    return context.Users.ToList();
+    Throw.ApiException(404, [
+        new("test error1"),
+        new("test error2"),
+        new("test error3"),
+        new("test error4"),
+    ]);
+});
+
+api.MapGet("/auth/test5", () => 
+{
+    throw new Exception("test error");
 });
 
 api.MapGet("/auth/logout", async (SignInManager<User> signInManager) =>

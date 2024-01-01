@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Forum.Domain\Forum.Domain.csproj" />
+    <ProjectReference Include="..\Forum.Common\Forum.Common.csproj" />
   </ItemGroup>
 
 </Project>
