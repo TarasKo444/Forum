@@ -3,8 +3,10 @@ using Mediator;
 
 namespace Forum.WebApi;
 
-public class LoginCallback
+public class GetAllPosts
 {
     public static async Task<IResult> Handler(ISender sender)
-        => Results.Json(await sender.Send(new LoginRequest()));
+    {
+        return Results.Json(await sender.Send(new GetAllPostsRequest()));
+    }
 }

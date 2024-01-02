@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace Forum.Application;
 
-public class GetRedirectPropertiesCommand : IRequest<AuthenticationProperties>
+public class RedirectPropertiesRequest : IRequest<AuthenticationProperties>
 {
     public string Callback { get; set; } = null!;
     public string Scheme { get; set; } = null!;
 }
 
-public class GetRedirectPropertiesCommandHandler(IExternalAuthService externalAuthService)
-    : IRequestHandler<GetRedirectPropertiesCommand, AuthenticationProperties>
+public class GetRedirectPropertiesRequestHandler(IExternalAuthService externalAuthService)
+    : IRequestHandler<RedirectPropertiesRequest, AuthenticationProperties>
 {
     private readonly IExternalAuthService _externalAuthService = externalAuthService;
 
     public ValueTask<AuthenticationProperties> Handle(
-        GetRedirectPropertiesCommand command, CancellationToken cancellationToken)
+        RedirectPropertiesRequest command, CancellationToken cancellationToken)
         => ValueTask.FromResult(_externalAuthService.GetRedirectProperties(command.Callback, command.Scheme));
 }

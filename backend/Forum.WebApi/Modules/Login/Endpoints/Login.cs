@@ -8,7 +8,7 @@ public class Login
 {
     public static async Task<IResult> Handler(ISender sender)
     {
-        var command = new GetRedirectPropertiesCommand
+        var command = new RedirectPropertiesRequest
         {
             Callback = "api/auth/login-callback",
             Scheme = GoogleDefaults.AuthenticationScheme

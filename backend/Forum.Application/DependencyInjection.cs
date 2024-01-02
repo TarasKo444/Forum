@@ -12,7 +12,9 @@ public static class DependencyInjection
         });
 
         services.AddHttpContextAccessor();
+        
         services.AddScoped<IExternalAuthService, ExternalAuthService>();
+        services.AddScoped<IUserContext, UserContext>();
 
         return services;
     }
