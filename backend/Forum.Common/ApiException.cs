@@ -1,9 +1,18 @@
 ﻿namespace Forum.Common;
 
-public record ApiError(string Message) 
+public record ApiError(string Details, string? Property = null)
 {
-    // public string? Property { get; set; }
-};
+    public string Message
+    { 
+        get 
+        {
+            if(Property is null)
+                return Details;
+            
+            return string.Format(Details, Property);
+        }
+    }
+}
 
 public class ApiException : Exception
 {

@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Forum.Application;
-using Forum.Domain.Entities;
+using Forum.Common;
 using Forum.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -11,7 +11,6 @@ namespace Forum.UnitTests;
 public class PostCrudeTests
 {   
     private readonly Guid _userid = Guid.NewGuid();
-    private readonly List<User> _userList = [];
     private readonly IUserContext _userContext;
     private readonly ForumDbContext _forumDbContext;
 
@@ -62,5 +61,38 @@ public class PostCrudeTests
 
         _forumDbContext.Posts.Should().NotBeEmpty();
         _forumDbContext.Posts.Should().HaveCount(3);
+    }
+
+    [Fact]
+    public async Task GetPostTest()
+    {
+        var post = await CreatePost();
+
+        var handler = new GetPostRequestHandler(_forumDbContext);
+        var response = await handler.Handle(new() 
+        {
+            Id = post.Id
+        }, new());
+
+        response.Id.Should().Be(post.Id);
+        _forumDbContext.Posts.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task GetPostTestWithWrongId()
+    {
+        await CreatePost();
+
+        var handler = new GetPostRequestHandler(_forumDbContext);
+        var request = new GetPostRequest()
+        {
+            Id = Guid.NewGuid()
+        };
+        
+        Func<Task> act = async () => await handler.Handle(request, new());
+
+        await act.Should()
+            .ThrowAsync<ApiException>()
+            .Where(e => e.Status == 400);
     }
 }
