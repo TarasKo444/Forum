@@ -30,4 +30,8 @@
       <ProjectReference Include="..\Forum.Application\Forum.Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\" />
+    </ItemGroup>
+
 </Project>

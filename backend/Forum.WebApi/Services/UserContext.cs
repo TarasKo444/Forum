@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using Forum.Common;
-using Microsoft.AspNetCore.Http;
 
 namespace Forum.Application;
 
@@ -10,11 +9,11 @@ public interface IUserContext
     public Guid UserId { get; }
 }
 
-public class UserContext(IHttpContextAccessor httpContextAccessor) : IUserContext
+public class UserContext(HttpContext httpContext) : IUserContext
 {
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly HttpContext _httpContext = httpContext;
 
-    public ClaimsPrincipal User => _httpContextAccessor.HttpContext.User;
+    public ClaimsPrincipal User => _httpContext.User;
 
     public Guid UserId 
     { 

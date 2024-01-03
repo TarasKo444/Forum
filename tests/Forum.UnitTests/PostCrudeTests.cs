@@ -11,15 +11,10 @@ namespace Forum.UnitTests;
 public class PostCrudeTests
 {   
     private readonly Guid _userid = Guid.NewGuid();
-    private readonly IUserContext _userContext;
     private readonly ForumDbContext _forumDbContext;
 
     public PostCrudeTests()
     {
-        var userContextMock = new Mock<IUserContext>();
-        userContextMock.Setup(i => i.UserId).Returns(_userid);
-        _userContext = userContextMock.Object;
-
         var contextOptions = new DbContextOptionsBuilder<ForumDbContext>()
             .UseInMemoryDatabase("PostCrudeTests")
             .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning))
@@ -33,12 +28,13 @@ public class PostCrudeTests
 
     public async Task<PostResponse> CreatePost()
     {
-        var handler = new CreatePostRequestHandler(_forumDbContext, _userContext);
+        var handler = new CreatePostRequestHandler(_forumDbContext);
         
         var post = await handler.Handle(new()
         {
             Header = "testheader",
-            Body = "testbody"
+            Body = "testbody",
+            PostCreatorId = _userid
         }, new());
 
         return post;

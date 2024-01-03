@@ -10,11 +10,8 @@ public static class DependencyInjection
         {
             options.ServiceLifetime = ServiceLifetime.Scoped;
         });
-
-        services.AddHttpContextAccessor();
         
         services.AddScoped<IExternalAuthService, ExternalAuthService>();
-        services.AddScoped<IUserContext, UserContext>();
 
         return services;
     }
