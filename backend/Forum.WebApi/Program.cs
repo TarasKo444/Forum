@@ -1,40 +1,45 @@
-using System.Security.Claims;
-using Forum.Common.Options;
+using Forum.Domain.Entities;
+using Forum.Infrastructure;
+using Forum.Application;
+using Forum.WebApi;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Forum.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<GoogleOAuthOptions>(
-    builder.Configuration.GetSection(nameof(GoogleOAuthOptions)));
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserContext, UserContext>();
 
-builder.Services.AddControllers();
+builder.Services.RegisterModules();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie()
+builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
+    {
+        options.User.AllowedUserNameCharacters = null!;
+    })
+    .AddEntityFrameworkStores<ForumDbContext>();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/api/auth/login";
+});
+
+builder.Services.AddAuthentication()
     .AddGoogle(options =>
     {
-        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-
-        options.ClientSecret = builder.Configuration["GoogleOAuthOptions:ClientSecret"]!;
         options.ClientId = builder.Configuration["GoogleOAuthOptions:ClientId"]!;
-
-        options.Scope.Add("email");
-        options.Scope.Add("profile");
-        options.Scope.Add("openid");
-
-        options.SaveTokens = true;
-        
-        options.ClaimActions.Clear();
-        options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
-        options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+        options.ClientSecret = builder.Configuration["GoogleOAuthOptions:ClientSecret"]!;
+        options.SignInScheme = IdentityConstants.ExternalScheme;
         options.ClaimActions.MapJsonKey("picture", "picture");
-        options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
     });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -50,29 +55,49 @@ else
 
 app.UseHttpsRedirection();
 
-app.UseRouting();
+app.UseCustomExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+var api = app.MapGroup("api");
+api.MapEndpoints();
 
-app.MapGet("/", (HttpContext context) =>
+api.MapGet("/auth/test", [Authorize] (HttpContext context) =>
 {
-    context.GetTokenAsync("access_token");
-    return context.User.Claims.Select(x => new { x.Type, x.Value }).ToList();
+    return context.User.Claims.Select(x => new { x.Type, x.Value });
 });
 
-app.MapGet("/login", () => Results.Challenge(new GoogleChallengeProperties()
+api.MapGet("/auth/test2", (ForumDbContext context) =>
 {
-    RedirectUri = "/"
-},new List<string> { GoogleDefaults.AuthenticationScheme }));
+    return context.Users.ToList();
+});
 
-app.MapGet("/logout", () => Results.SignOut(new AuthenticationProperties()
+api.MapGet("/auth/test3", async (ForumDbContext context) =>
 {
-    RedirectUri = "/"
-},new List<string> { CookieAuthenticationDefaults.AuthenticationScheme }));
+    var users = context.Users.ToList(); 
+    context.Users.RemoveRange(users);
+    await context.SaveChangesAsync();
+});
 
-app.MapGet("/authtest", [Authorize]() => "Authorized");
+api.MapGet("/auth/test4", () => 
+{
+    throw new ApiException(404, new List<ApiError> {
+        new("test error1"),
+        new("test error2"),
+        new("test error3"),
+        new("test error4")
+    });
+});
+
+api.MapGet("/auth/test5", () => 
+{
+    throw new Exception("test error");
+});
+
+api.MapGet("/auth/logout", async (SignInManager<User> signInManager) =>
+{
+    await signInManager.SignOutAsync();
+});
 
 app.Run();
