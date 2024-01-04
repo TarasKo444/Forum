@@ -1,5 +1,4 @@
-﻿using Forum.Common;
-using Forum.Domain;
+﻿using ErrorOr;
 using Forum.Infrastructure;
 using Mapster;
 using Mediator;
@@ -7,21 +6,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Application;
 
-public class GetPostRequest : IRequest<PostResponse>
+public class GetPostRequest : IRequest<ErrorOr<PostResponse>>
 {
     public Guid Id { get; set; }
 }
 
 public class GetPostRequestHandler(ForumDbContext forumDbContext)
-    : IRequestHandler<GetPostRequest, PostResponse>
+    : IRequestHandler<GetPostRequest, ErrorOr<PostResponse>>
 {
     private readonly ForumDbContext _forumDbContext = forumDbContext;
 
-    public async ValueTask<PostResponse> Handle(GetPostRequest request, CancellationToken cancellationToken)
+    public async ValueTask<ErrorOr<PostResponse>> Handle(GetPostRequest request, CancellationToken cancellationToken)
     {
         var post = await _forumDbContext.Posts.FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
-
-        Throw.ApiExceptionIfNull(post, 400, new("post with provided [{0}] not found", nameof(request.Id)));
+        
+        if(post is null)
+            return Error.NotFound(description: "post with given id not found");
 
         return post.Adapt<PostResponse>();
     }

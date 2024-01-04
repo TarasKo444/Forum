@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserContext, UserContext>();
 
 builder.Services.RegisterModules();
@@ -81,12 +82,12 @@ api.MapGet("/auth/test3", async (ForumDbContext context) =>
 
 api.MapGet("/auth/test4", () => 
 {
-    Throw.ApiException(404, [
+    throw new ApiException(404, new List<ApiError> {
         new("test error1"),
         new("test error2"),
         new("test error3"),
-        new("test error4"),
-    ]);
+        new("test error4")
+    });
 });
 
 api.MapGet("/auth/test5", () => 

@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using ErrorOr;
 using Forum.Common;
 using Forum.Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
@@ -10,7 +11,7 @@ namespace Forum.Application;
 public interface IExternalAuthService 
 {
     public AuthenticationProperties GetRedirectProperties(string callback, string scheme);
-    public Task<Guid> LoginUser();
+    public Task<ErrorOr<Guid>> LoginUser();
 }
 
 public class ExternalAuthService(
@@ -23,12 +24,13 @@ public class ExternalAuthService(
     public AuthenticationProperties GetRedirectProperties(string callback, string scheme)
         => _signInManager.ConfigureExternalAuthenticationProperties(scheme, callback);
 
-    public async Task<Guid> LoginUser() 
+    public async Task<ErrorOr<Guid>> LoginUser() 
     {
         var info = await _signInManager.GetExternalLoginInfoAsync();
-
-        Throw.ApiExceptionIfNull(info, 401, new("external login failed"));
         
+        if(info is null)
+            return Error.Unauthorized(description: "external login failed");
+
         var result = await _signInManager.ExternalLoginSignInAsync(
             info!.LoginProvider, info.ProviderKey, false, true);
 
@@ -44,9 +46,9 @@ public class ExternalAuthService(
             await _signInManager.UserManager.CreateAsync(user);
 
             var userResult = await _signInManager.UserManager.AddLoginAsync(user, info);
-            
-            Throw.ApiExceptionIf(!userResult.Succeeded,
-                401, userResult.Errors.Select(e => new ApiError(e.Description)));
+        
+            if(!userResult.Succeeded)
+                return Error.Unauthorized(description: "user creating failed");
 
             await _signInManager.UserManager.AddClaimAsync(user, info.Principal.FindFirst("picture")!);
 

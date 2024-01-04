@@ -70,7 +70,7 @@ public class PostCrudeTests
             Id = post.Id
         }, new());
 
-        response.Id.Should().Be(post.Id);
+        response.Value.Id.Should().Be(post.Id);
         _forumDbContext.Posts.Should().HaveCount(1);
     }
 
@@ -85,10 +85,9 @@ public class PostCrudeTests
             Id = Guid.NewGuid()
         };
         
-        Func<Task> act = async () => await handler.Handle(request, new());
+        var response = await handler.Handle(request, new());
 
-        await act.Should()
-            .ThrowAsync<ApiException>()
-            .Where(e => e.Status == 400);
+        response.Errors.Should().NotBeEmpty();
+        response.Errors.First().Code.Should().Be("General.NotFound");
     }
 }

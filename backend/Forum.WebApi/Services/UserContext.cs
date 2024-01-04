@@ -9,11 +9,11 @@ public interface IUserContext
     public Guid UserId { get; }
 }
 
-public class UserContext(HttpContext httpContext) : IUserContext
+public class UserContext(IHttpContextAccessor httpContextAccessor) : IUserContext
 {
-    private readonly HttpContext _httpContext = httpContext;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    public ClaimsPrincipal User => _httpContext.User;
+    public ClaimsPrincipal User => _httpContextAccessor.HttpContext!.User;
 
     public Guid UserId 
     { 
@@ -22,7 +22,7 @@ public class UserContext(HttpContext httpContext) : IUserContext
             if (Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id))
                 return id;
 
-            throw new ApiException(401, [new("user not authorized")]);
+            throw new ApiException(401, "user not authorized");
         }
     }
 }

@@ -25,4 +25,10 @@ public class ApiException : Exception
         Status = status;
         Errors = errors;
     }
+
+    public ApiException(int status, string error)
+    {
+        Status = status;
+        Errors = [new(error)];
+    }
 }
