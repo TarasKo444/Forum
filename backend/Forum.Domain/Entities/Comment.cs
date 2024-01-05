@@ -1,6 +1,5 @@
-﻿using Forum.Domain.Entities;
-
-namespace Forum.Domain;
+﻿
+namespace Forum.Domain.Entities;
 
 public class Comment
 {
@@ -16,4 +15,5 @@ public class Comment
     public Guid? ParentCommentId { get; set; }
     public User Writer { get; set; } = null!;
     public Guid WriterId { get; set; }
+    public ICollection<UniqueCommentVote> VotesInfo { get; set; } = null!;
 }

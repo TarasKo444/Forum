@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using ErrorOr;
-using Forum.Common;
 using Forum.Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;

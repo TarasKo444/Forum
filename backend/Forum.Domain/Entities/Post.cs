@@ -1,6 +1,5 @@
-﻿using Forum.Domain.Entities;
-
-namespace Forum.Domain;
+﻿
+namespace Forum.Domain.Entities;
 
 public class Post
 {
@@ -13,4 +12,5 @@ public class Post
     public User PostCreator { get; set; } = null!;
     public Guid PostCreatorId { get; set; }
     public ICollection<Comment> Comments { get; } = new List<Comment>();
+    public ICollection<UniquePostVote> VotesInfo { get; set; } = null!;
 }

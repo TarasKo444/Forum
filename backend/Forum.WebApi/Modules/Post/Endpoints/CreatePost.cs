@@ -8,7 +8,6 @@ namespace Forum.WebApi;
 
 public class CreatePost
 {
-    [Authorize]
     public static async Task<IResult> Handler(ISender sender, IUserContext userContext, [FromBody] PostDto postDto)
     {
         var request = postDto.Adapt<CreatePostRequest>();
