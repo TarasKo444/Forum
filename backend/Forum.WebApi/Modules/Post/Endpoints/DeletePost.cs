@@ -8,7 +8,6 @@ namespace Forum.WebApi;
 
 public class DeletePost
 {
-    [Authorize]
     public static async Task<IResult> Handler(ISender sender, IUserContext userContext, Guid id)
     {
         var result = await sender.Send(new DeletePostRequest()

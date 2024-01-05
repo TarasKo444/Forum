@@ -1,10 +1,8 @@
 using FluentAssertions;
 using Forum.Application;
-using Forum.Common;
 using Forum.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Moq;
 
 namespace Forum.UnitTests;
 

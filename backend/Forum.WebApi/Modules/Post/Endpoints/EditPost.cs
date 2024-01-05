@@ -10,7 +10,6 @@ namespace Forum.WebApi;
 
 public class EditPost
 {
-    [Authorize]
     public static async Task<IResult> Handler(ISender sender, IUserContext userContext, Guid id, [FromBody] PostDto postDto)
     {
         var request = postDto.Adapt<EditPostRequest>();

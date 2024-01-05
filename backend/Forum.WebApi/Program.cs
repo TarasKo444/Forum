@@ -61,6 +61,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 var api = app.MapGroup("api");
+
 api.MapEndpoints();
 
 api.MapGet("/auth/test", [Authorize] (HttpContext context) =>
@@ -101,3 +102,5 @@ api.MapGet("/auth/logout", async (SignInManager<User> signInManager) =>
 });
 
 app.Run();
+
+public partial class Program { }
