@@ -90,4 +90,82 @@ public class PostCrudeTests
         response.Errors.Should().NotBeEmpty();
         response.Errors.First().Code.Should().Be("General.NotFound");
     }
+
+    [Fact]
+    public async Task EditPostTest()
+    {
+        var post = await CreatePost();
+
+        var handler = new EditPostRequestHandler(_forumDbContext);
+
+        var request = new EditPostRequest()
+        {
+            Id = post.Id,
+            PostCreatorId = _userid,
+            Body = "1",
+            Header = "2"
+        };
+        
+        var response = await handler.Handle(request, new());
+
+        response.Value.Id.Should().Be(post.Id);
+        response.Value.PostCreatorId.Should().Be(_userid);
+        response.Value.Body.Should().Be("1");
+    }
+
+    [Fact]
+    public async Task EditPostTestWithError1()
+    {
+        var handler = new EditPostRequestHandler(_forumDbContext);
+
+        var request = new EditPostRequest()
+        {
+            Id = Guid.NewGuid(),
+            PostCreatorId = _userid,
+            Body = "1",
+            Header = "2"
+        };
+        
+        var response = await handler.Handle(request, new());
+
+        response.FirstError.Code.Should().Be("General.NotFound");
+    }
+
+    [Fact]
+    public async Task EditPostTestWithError2()
+    {
+        var post = await CreatePost();
+
+        var handler = new EditPostRequestHandler(_forumDbContext);
+
+        var request = new EditPostRequest()
+        {
+            Id = post.Id,
+            PostCreatorId = Guid.NewGuid(),
+            Body = "1",
+            Header = "2"
+        };
+        
+        var response = await handler.Handle(request, new());
+
+        response.FirstError.Code.Should().Be("General.Unauthorized");
+    }
+
+    [Fact]
+    public async Task DeletePostTest()
+    {
+        var post = await CreatePost();
+
+        var handler = new DeletePostRequestHandler(_forumDbContext);
+
+        var request = new DeletePostRequest()
+        {
+            Id = post.Id,
+            PostCreatorId = _userid
+        };
+        
+        await handler.Handle(request, new());
+
+        _forumDbContext.Posts.Should().BeEmpty();
+    }
 }

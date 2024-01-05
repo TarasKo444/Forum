@@ -1,4 +1,4 @@
-﻿using Forum.Domain;
+﻿using Forum.Domain.Entities;
 using Forum.Infrastructure;
 using Mapster;
 using Mediator;

@@ -1,5 +1,4 @@
 ﻿
-using Forum.Domain;
 using Forum.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -12,6 +11,8 @@ public class ForumDbContext(DbContextOptions options)
 {
     public DbSet<Post> Posts { get; set; } = null!;
     public DbSet<Comment> Comments { get; set; } = null!;
+    public DbSet<UniquePostVote> UniquePostVotes { get; set; } = null!;
+    public DbSet<UniqueCommentVote> UniqueCommentVotes { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -40,6 +41,32 @@ public class ForumDbContext(DbContextOptions options)
                 .WithOne(r => r.ParentComment)
                 .HasForeignKey(r => r.ParentCommentId)
                 .IsRequired(false);
+        });
+
+        builder.Entity<UniquePostVote>(vote =>
+        {
+            vote.HasOne(v => v.Post)
+                .WithMany(p => p.VotesInfo)
+                .HasForeignKey(v => v.PostId)
+                .IsRequired();
+
+            vote.HasOne(v => v.User)
+                .WithMany(u => u.VotedPosts)
+                .HasForeignKey(v => v.UserId)
+                .IsRequired();
+        });
+
+        builder.Entity<UniqueCommentVote>(vote =>
+        {
+            vote.HasOne(v => v.Comment)
+                .WithMany(c => c.VotesInfo)
+                .HasForeignKey(v => v.CommentId)
+                .IsRequired();
+
+            vote.HasOne(v => v.User)
+                .WithMany(p => p.VotedComments)
+                .HasForeignKey(v => v.UserId)
+                .IsRequired();
         });
 
         base.OnModelCreating(builder);
