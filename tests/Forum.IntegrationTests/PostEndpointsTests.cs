@@ -75,6 +75,7 @@ public class PostEndpointsTests : IClassFixture<WebAppFactory<Program>>
         var dbContext = GetDbContext(scope);
 
         dbContext.Posts.Should().NotBeEmpty();
+        dbContext.Posts.Should().HaveCount(1);
     }
 
     [Fact]
@@ -118,5 +119,49 @@ public class PostEndpointsTests : IClassFixture<WebAppFactory<Program>>
 
         dbContext.Posts.Should().NotBeEmpty();
         dbContext.Posts.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task EditPostEndpointTest()
+    { 
+        using var scope = _factory.Services.CreateScope();
+        var dbContext = GetDbContext(scope);
+        
+        var createResponse = await CreatePost();
+        var createdPost = (await createResponse.Content.ReadFromJsonAsync<PostResponse>())!;
+
+        var response = await _client.PutAsJsonAsync<PostDto>($"api/posts/{createdPost.Id}", new()
+        {
+            Header = "edited1",
+            Body = "edited2"
+        });
+
+        response.IsSuccessStatusCode.Should().BeTrue();
+
+        var post = await response.Content.ReadFromJsonAsync<PostResponse>();
+
+        post.Should().NotBeNull();
+
+        post!.Id.Should().Be(createdPost.Id);
+        post!.Header.Should().NotBe(createdPost.Body);
+        post!.Body.Should().NotBe(createdPost.Header);
+        dbContext.Posts.Should().NotBeEmpty();
+        dbContext.Posts.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task DeletePostEndpointTest()
+    { 
+        using var scope = _factory.Services.CreateScope();
+        var dbContext = GetDbContext(scope);
+        
+        var createResponse = await CreatePost();
+        var createdPost = (await createResponse.Content.ReadFromJsonAsync<PostResponse>())!;
+
+        var response = await _client.DeleteAsync($"api/posts/{createdPost.Id}");
+
+        response.IsSuccessStatusCode.Should().BeTrue();
+
+        dbContext.Posts.Should().BeEmpty();
     }
 }

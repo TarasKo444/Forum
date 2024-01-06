@@ -4,7 +4,7 @@ using Mediator;
 
 namespace Forum.WebApi;
 
-public class GetPost
+public class GetPostEndpoint
 {
     public static async Task<IResult> Handler(ISender sender, Guid id)
     {

@@ -3,7 +3,7 @@ using Mediator;
 
 namespace Forum.WebApi;
 
-public class GetAllPosts
+public class GetAllPostsEndpoint
 {
     public static async Task<IResult> Handler(ISender sender)
     {
