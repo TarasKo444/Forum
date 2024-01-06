@@ -1,12 +1,11 @@
 ﻿using Forum.Application;
 using Mapster;
 using Mediator;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.WebApi;
 
-public class CreatePost
+public class CreatePostEndpoint
 {
     public static async Task<IResult> Handler(ISender sender, IUserContext userContext, [FromBody] PostDto postDto)
     {

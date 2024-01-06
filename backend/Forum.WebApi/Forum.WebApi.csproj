@@ -31,7 +31,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Modules\Comment\" />
       <Folder Include="Modules\Vote\" />
       <Folder Include="Services\" />
     </ItemGroup>

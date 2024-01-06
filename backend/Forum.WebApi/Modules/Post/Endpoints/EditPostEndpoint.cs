@@ -1,20 +1,21 @@
 ﻿using ErrorOr;
 using Forum.Application;
 using Forum.Common;
+using Mapster;
 using Mediator;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.WebApi;
 
-public class DeletePost
+public class EditPostEndpoint
 {
-    public static async Task<IResult> Handler(ISender sender, IUserContext userContext, Guid id)
+    public static async Task<IResult> Handler(ISender sender, IUserContext userContext, Guid id, [FromBody] PostDto postDto)
     {
-        var result = await sender.Send(new DeletePostRequest()
-        {
-            Id = id,
-            PostCreatorId = userContext.UserId
-        });
+        var request = postDto.Adapt<EditPostRequest>();
+        request.Id = id;
+        request.PostCreatorId = userContext.UserId;
+
+        var result = await sender.Send(request);
 
         return Results.Json(result.MatchFirst(
             value => value,
