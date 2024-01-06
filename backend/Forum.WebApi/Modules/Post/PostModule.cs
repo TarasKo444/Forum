@@ -15,3 +15,8 @@ public class PostModule : IModule
         return endpoints;
     }
 }
+
+class A
+{
+    public static virtual void Method() {}
+}
