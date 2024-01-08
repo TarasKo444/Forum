@@ -1,9 +1,12 @@
 ﻿using Forum.Application;
+using Forum.Application.Commands.Post;
+using Forum.WebApi.Modules.Post.DTOs;
+using Forum.WebApi.Services;
 using Mapster;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Forum.WebApi;
+namespace Forum.WebApi.Modules.Post.Endpoints;
 
 public class CreatePostEndpoint
 {

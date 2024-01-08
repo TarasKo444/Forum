@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
-namespace Forum.Application;
+namespace Forum.Application.Services;
 
 public interface IExternalAuthService 
 {

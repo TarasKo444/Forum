@@ -1,8 +1,8 @@
-﻿using Forum.Application;
+﻿using Forum.Application.Commands.Post;
 using Forum.Common;
 using Mediator;
 
-namespace Forum.WebApi;
+namespace Forum.WebApi.Modules.Post.Endpoints;
 
 public class GetPostEndpoint
 {

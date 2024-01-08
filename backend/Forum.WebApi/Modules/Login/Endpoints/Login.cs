@@ -1,8 +1,8 @@
-﻿using Forum.Application;
+﻿using Forum.Application.Commands.Login;
 using Mediator;
 using Microsoft.AspNetCore.Authentication.Google;
 
-namespace Forum.WebApi;
+namespace Forum.WebApi.Modules.Login.Endpoints;
 
 public class Login
 {

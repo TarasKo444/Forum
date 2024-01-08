@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Forum.Common;
 
-namespace Forum.Application;
+namespace Forum.WebApi.Services;
 
 public interface IUserContext
 {

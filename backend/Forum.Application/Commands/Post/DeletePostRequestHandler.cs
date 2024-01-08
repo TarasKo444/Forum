@@ -3,7 +3,7 @@ using Forum.Infrastructure;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
-namespace Forum.Application;
+namespace Forum.Application.Commands.Post;
 
 public class DeletePostRequest : IRequest<ErrorOr<Unit>>
 {

@@ -1,4 +1,4 @@
-﻿namespace Forum.WebApi;
+﻿namespace Forum.WebApi.Modules.Post.DTOs;
 
 public class PostDto
 {

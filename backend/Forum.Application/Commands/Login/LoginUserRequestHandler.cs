@@ -1,8 +1,8 @@
-﻿
-using ErrorOr;
+﻿using ErrorOr;
+using Forum.Application.Services;
 using Mediator;
 
-namespace Forum.Application;
+namespace Forum.Application.Commands.Login;
 
 public class LoginRequest : IRequest<ErrorOr<Guid>>
 {

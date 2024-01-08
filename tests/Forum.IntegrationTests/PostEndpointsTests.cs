@@ -5,6 +5,8 @@ using Forum.WebApi;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Forum.Application;
+using Forum.Application.Commands.Post.Models;
+using Forum.WebApi.Modules.Post.DTOs;
 
 namespace Forum.IntegrationTests;
 

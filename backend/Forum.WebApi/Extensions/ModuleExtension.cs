@@ -1,4 +1,4 @@
-﻿namespace Forum.WebApi;
+﻿namespace Forum.WebApi.Extensions;
 
 public interface IModule
 {

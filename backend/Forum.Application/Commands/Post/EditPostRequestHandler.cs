@@ -1,10 +1,11 @@
 ﻿using ErrorOr;
+using Forum.Application.Commands.Post.Models;
 using Forum.Infrastructure;
 using Mapster;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
-namespace Forum.Application;
+namespace Forum.Application.Commands.Post;
 
 public class EditPostRequest : IRequest<ErrorOr<PostResponse>>
 {

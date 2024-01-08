@@ -1,9 +1,9 @@
-﻿using Forum.Domain.Entities;
+﻿using Forum.Application.Commands.Post.Models;
 using Forum.Infrastructure;
 using Mapster;
 using Mediator;
 
-namespace Forum.Application;
+namespace Forum.Application.Commands.Post;
 
 public class CreatePostRequest : IRequest<PostResponse>
 {
@@ -19,7 +19,7 @@ public class CreatePostRequestHandler(ForumDbContext forumDbContext)
 
     public async ValueTask<PostResponse> Handle(CreatePostRequest request, CancellationToken cancellationToken)
     {
-        var post = request.Adapt<Post>();
+        var post = request.Adapt<Domain.Entities.Post>();
         post.CreatedAt = DateTime.UtcNow;
 
         await _forumDbContext.Posts.AddAsync(post);

@@ -1,5 +1,7 @@
 ﻿
-namespace Forum.WebApi;
+using Forum.WebApi.Extensions;
+
+namespace Forum.WebApi.Modules.Comment;
 
 public class CommentModule : IModule
 {

@@ -1,9 +1,11 @@
 ﻿using ErrorOr;
 using Forum.Application;
+using Forum.Application.Commands.Post;
 using Forum.Common;
+using Forum.WebApi.Services;
 using Mediator;
 
-namespace Forum.WebApi;
+namespace Forum.WebApi.Modules.Post.Endpoints;
 
 public class DeletePostEndpoint
 {

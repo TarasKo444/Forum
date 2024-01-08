@@ -1,7 +1,8 @@
-﻿using Mediator;
+﻿using Forum.Application.Services;
+using Mediator;
 using Microsoft.AspNetCore.Authentication;
 
-namespace Forum.Application;
+namespace Forum.Application.Commands.Login;
 
 public class RedirectPropertiesRequest : IRequest<AuthenticationProperties>
 {

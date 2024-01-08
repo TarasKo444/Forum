@@ -1,8 +1,8 @@
-﻿using Forum.Application;
+﻿using Forum.Application.Commands.Login;
 using Forum.Common;
 using Mediator;
 
-namespace Forum.WebApi;
+namespace Forum.WebApi.Modules.Login.Endpoints;
 
 public class LoginCallback
 {

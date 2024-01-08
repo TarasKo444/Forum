@@ -1,7 +1,7 @@
-﻿
-using Forum.Infrastructure;
+﻿using Forum.WebApi.Extensions;
+using Forum.WebApi.Modules.Post.Endpoints;
 
-namespace Forum.WebApi;
+namespace Forum.WebApi.Modules.Post;
 
 public class PostModule : IModule
 {

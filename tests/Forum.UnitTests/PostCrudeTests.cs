@@ -1,5 +1,7 @@
 using FluentAssertions;
 using Forum.Application;
+using Forum.Application.Commands.Post;
+using Forum.Application.Commands.Post.Models;
 using Forum.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;

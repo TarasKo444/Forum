@@ -1,4 +1,4 @@
-﻿namespace Forum.Application;
+﻿namespace Forum.Application.Commands.Post.Models;
 
 public class PostResponse
 {

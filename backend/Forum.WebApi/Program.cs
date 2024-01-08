@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Forum.Common;
+using Forum.WebApi.Extensions;
+using Forum.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,9 +1,10 @@
-﻿using Forum.Infrastructure;
+﻿using Forum.Application.Commands.Post.Models;
+using Forum.Infrastructure;
 using Mapster;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
-namespace Forum.Application;
+namespace Forum.Application.Commands.Post;
 
 public class GetAllPostsRequest : IRequest<IEnumerable<PostResponse>>
 {

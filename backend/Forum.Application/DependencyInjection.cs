@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Forum.Application.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Forum.Application;
 
