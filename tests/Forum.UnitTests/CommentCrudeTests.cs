@@ -158,4 +158,86 @@ public class CommentCrudeTests
 
         _testOutputHelper.WriteLine(JsonSerializer.Serialize(comments));
     }
+    
+    [Fact]
+    public async Task EditRepliesCommentsTest()
+    {
+        var post = await PostCrudeTests.CreatePost(_forumDbContext, _userid);
+        
+        var comment1 = await CreateComment(_forumDbContext, post.Value.Id, _userid);
+        var comment21 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment1.Value.Id);
+
+        var handler = new EditCommentRequestHandler(_forumDbContext);
+
+        var result = await handler.Handle(new()
+        {
+            Body = "adasdas",
+            Id = comment1.Value.Id,
+            WriterId = _userid
+        }, new());
+
+        result.Value.Id.Should().Be(comment1.Value.Id);
+
+        _testOutputHelper.WriteLine(JsonSerializer.Serialize(result.Value));
+    }
+    
+    [Fact]
+    public async Task EditRepliesCommentsErrorTest()
+    {
+        var post = await PostCrudeTests.CreatePost(_forumDbContext, _userid);
+        
+        var comment1 = await CreateComment(_forumDbContext, post.Value.Id, _userid);
+        var comment21 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment1.Value.Id);
+
+        var handler = new EditCommentRequestHandler(_forumDbContext);
+
+        var result = await handler.Handle(new()
+        {
+            Body = "adasdas",
+            Id = Guid.NewGuid()
+        }, new());
+
+        result.IsError.Should().BeTrue();
+    }
+    
+    [Fact]
+    public async Task DeleteRepliesCommentsTest()
+    {
+        var post = await PostCrudeTests.CreatePost(_forumDbContext, _userid);
+        
+        var comment1 = await CreateComment(_forumDbContext, post.Value.Id, _userid);
+        var comment21 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment1.Value.Id);
+
+        var handler = new DeleteCommentRequestHandler(_forumDbContext);
+
+        var result = await handler.Handle(new()
+        {
+            Id = comment1.Value.Id,
+            WriterId = _userid
+        }, new());
+
+        result.IsError.Should().BeFalse();
+
+        _testOutputHelper.WriteLine(JsonSerializer.Serialize(result.Value));
+    }
+    
+    [Fact]
+    public async Task DeleteRepliesCommentsErrorTest()
+    {
+        var post = await PostCrudeTests.CreatePost(_forumDbContext, _userid);
+        
+        var comment1 = await CreateComment(_forumDbContext, post.Value.Id, _userid);
+        var comment21 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment1.Value.Id);
+
+        var handler = new DeleteCommentRequestHandler(_forumDbContext);
+
+        var result = await handler.Handle(new()
+        {
+            Id = Guid.NewGuid()
+        }, new());
+
+        result.IsError.Should().BeTrue();
+
+        _testOutputHelper.WriteLine(JsonSerializer.Serialize(result.Value));
+    }
 }
