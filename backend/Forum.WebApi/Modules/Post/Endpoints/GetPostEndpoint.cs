@@ -1,5 +1,5 @@
 ﻿using Forum.Application.Commands.Post;
-using Forum.Common;
+using Forum.WebApi.Extensions;
 using Mediator;
 
 namespace Forum.WebApi.Modules.Post.Endpoints;
@@ -13,9 +13,6 @@ public class GetPostEndpoint
             Id = id
         });
 
-        return Results.Json(result.MatchFirst(
-            value => value,
-            error => throw new ApiException(404, error.Description)
-        ));
+        return CustomResults.Json(result);
     }
 }

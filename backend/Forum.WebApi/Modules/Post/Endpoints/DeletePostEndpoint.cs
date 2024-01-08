@@ -2,6 +2,7 @@
 using Forum.Application;
 using Forum.Application.Commands.Post;
 using Forum.Common;
+using Forum.WebApi.Extensions;
 using Forum.WebApi.Services;
 using Mediator;
 
@@ -17,17 +18,6 @@ public class DeletePostEndpoint
             PostCreatorId = userContext.UserId
         });
 
-        return Results.Json(result.MatchFirst(
-            value => value,
-            error => 
-            {
-                switch(error.Type)
-                {
-                    case ErrorType.Unauthorized : throw new ApiException(403, error.Description);
-                    case ErrorType.NotFound : throw new ApiException(404, error.Description);
-                    default : throw new ApiException(500, error.Description);
-                }
-            }
-        ));
+        return CustomResults.Json(result);
     }
 }

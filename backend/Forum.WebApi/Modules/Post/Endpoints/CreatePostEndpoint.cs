@@ -1,5 +1,6 @@
 ﻿using Forum.Application;
 using Forum.Application.Commands.Post;
+using Forum.WebApi.Extensions;
 using Forum.WebApi.Modules.Post.DTOs;
 using Forum.WebApi.Services;
 using Mapster;
@@ -15,6 +16,8 @@ public class CreatePostEndpoint
         var request = postDto.Adapt<CreatePostRequest>();
         request.PostCreatorId = userContext.UserId;
 
-        return Results.Json(await sender.Send(request));
+        var result = await sender.Send(request);
+        
+        return CustomResults.Json(result);
     }
 }

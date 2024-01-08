@@ -16,5 +16,7 @@ public class GetAllPostsRequestHandler(ForumDbContext forumDbContext)
     private readonly ForumDbContext _forumDbContext = forumDbContext;
 
     public ValueTask<IEnumerable<PostResponse>> Handle(GetAllPostsRequest request, CancellationToken cancellationToken)
-        => ValueTask.FromResult(_forumDbContext.Posts.AsNoTracking().ProjectToType<PostResponse>() as IEnumerable<PostResponse>);
+        => ValueTask.FromResult(_forumDbContext.Posts
+            .AsNoTracking()
+            .ProjectToType<PostResponse>() as IEnumerable<PostResponse>);
 }

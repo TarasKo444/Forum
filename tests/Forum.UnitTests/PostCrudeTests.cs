@@ -1,7 +1,9 @@
+using ErrorOr;
 using FluentAssertions;
 using Forum.Application;
 using Forum.Application.Commands.Post;
 using Forum.Application.Commands.Post.Models;
+using Forum.Domain.Entities;
 using Forum.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -21,20 +23,23 @@ public class PostCrudeTests
             .Options;
 
         _forumDbContext = new(contextOptions);
-
+        
         _forumDbContext.Database.EnsureDeleted();
         _forumDbContext.Database.EnsureCreated();
+        
+        _forumDbContext.Users.Add(new User() { JoinedAt = DateTime.Now, Id = _userid });
+        _forumDbContext.SaveChanges();
     }
 
-    public async Task<PostResponse> CreatePost()
+    public static async Task<ErrorOr<PostResponse>> CreatePost(ForumDbContext forumDbContext, Guid userid)
     {
-        var handler = new CreatePostRequestHandler(_forumDbContext);
+        var handler = new CreatePostRequestHandler(forumDbContext);
         
         var post = await handler.Handle(new()
         {
             Header = "testheader",
             Body = "testbody",
-            PostCreatorId = _userid
+            PostCreatorId = userid
         }, new());
 
         return post;
@@ -43,17 +48,25 @@ public class PostCrudeTests
     [Fact]
     public async Task CreatePostTest()
     {
-        var post = await CreatePost();
+        var post = await CreatePost(_forumDbContext, _userid);
 
-        (await _forumDbContext.Posts.FirstAsync()).Id.Should().Be(post.Id);
+        (await _forumDbContext.Posts.FirstAsync()).Id.Should().Be(post.Value.Id);
+    }
+    
+    [Fact]
+    public async Task CreatePostErrorTest()
+    {
+        var post = await CreatePost(_forumDbContext, Guid.NewGuid());
+
+        post.IsError.Should().BeTrue();
     }
 
     [Fact]
     public async Task GetAllPostsTest()
     {
-        await CreatePost();
-        await CreatePost();
-        await CreatePost();
+        await CreatePost(_forumDbContext, _userid);
+        await CreatePost(_forumDbContext, _userid);
+        await CreatePost(_forumDbContext, _userid);
 
         _forumDbContext.Posts.Should().NotBeEmpty();
         _forumDbContext.Posts.Should().HaveCount(3);
@@ -62,22 +75,36 @@ public class PostCrudeTests
     [Fact]
     public async Task GetPostTest()
     {
-        var post = await CreatePost();
+        var post = await CreatePost(_forumDbContext, _userid);
 
         var handler = new GetPostRequestHandler(_forumDbContext);
         var response = await handler.Handle(new() 
         {
-            Id = post.Id
+            Id = post.Value.Id
         }, new());
 
-        response.Value.Id.Should().Be(post.Id);
+        response.Value.Id.Should().Be(post.Value.Id);
         _forumDbContext.Posts.Should().HaveCount(1);
+    }
+    
+    [Fact]
+    public async Task GetPostErrorTest()
+    {
+        var post = await CreatePost(_forumDbContext, _userid);
+
+        var handler = new GetPostRequestHandler(_forumDbContext);
+        var response = await handler.Handle(new() 
+        {
+            Id = Guid.NewGuid()
+        }, new());
+
+        response.IsError.Should().BeTrue();
     }
 
     [Fact]
     public async Task GetPostTestWithWrongId()
     {
-        await CreatePost();
+        await CreatePost(_forumDbContext, _userid);
 
         var handler = new GetPostRequestHandler(_forumDbContext);
         var request = new GetPostRequest()
@@ -94,13 +121,13 @@ public class PostCrudeTests
     [Fact]
     public async Task EditPostTest()
     {
-        var post = await CreatePost();
+        var post = await CreatePost(_forumDbContext, _userid);
 
         var handler = new EditPostRequestHandler(_forumDbContext);
 
         var request = new EditPostRequest()
         {
-            Id = post.Id,
+            Id = post.Value.Id,
             PostCreatorId = _userid,
             Body = "1",
             Header = "2"
@@ -108,7 +135,7 @@ public class PostCrudeTests
         
         var response = await handler.Handle(request, new());
 
-        response.Value.Id.Should().Be(post.Id);
+        response.Value.Id.Should().Be(post.Value.Id);
         response.Value.PostCreatorId.Should().Be(_userid);
         response.Value.Body.Should().Be("1");
     }
@@ -134,13 +161,13 @@ public class PostCrudeTests
     [Fact]
     public async Task EditPostTestWithError2()
     {
-        var post = await CreatePost();
+        var post = await CreatePost(_forumDbContext, _userid);
 
         var handler = new EditPostRequestHandler(_forumDbContext);
 
         var request = new EditPostRequest()
         {
-            Id = post.Id,
+            Id = post.Value.Id,
             PostCreatorId = Guid.NewGuid(),
             Body = "1",
             Header = "2"
@@ -148,19 +175,19 @@ public class PostCrudeTests
         
         var response = await handler.Handle(request, new());
 
-        response.FirstError.Code.Should().Be("General.Unauthorized");
+        response.IsError.Should().BeTrue();
     }
 
     [Fact]
     public async Task DeletePostTest()
     {
-        var post = await CreatePost();
+        var post = await CreatePost(_forumDbContext, _userid);
 
         var handler = new DeletePostRequestHandler(_forumDbContext);
 
         var request = new DeletePostRequest()
         {
-            Id = post.Id,
+            Id = post.Value.Id,
             PostCreatorId = _userid
         };
         

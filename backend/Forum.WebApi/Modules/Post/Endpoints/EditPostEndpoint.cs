@@ -1,5 +1,4 @@
 ﻿using ErrorOr;
-using Forum.Application;
 using Forum.Application.Commands.Post;
 using Forum.Common;
 using Forum.WebApi.Modules.Post.DTOs;

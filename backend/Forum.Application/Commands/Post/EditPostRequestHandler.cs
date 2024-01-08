@@ -22,6 +22,9 @@ public class EditPostRequestHandler(ForumDbContext forumDbContext)
 
     public async ValueTask<ErrorOr<PostResponse>> Handle(EditPostRequest request, CancellationToken cancellationToken)
     {
+        if (await _forumDbContext.Users.SingleOrDefaultAsync(u => u.Id == request.PostCreatorId, cancellationToken) is null)
+            return Error.NotFound(description: "user with given id not found");
+        
         var post = await _forumDbContext.Posts.FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
 
         if(post is null)
