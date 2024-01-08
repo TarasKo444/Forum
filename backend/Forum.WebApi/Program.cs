@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Forum.Common;
 using Forum.WebApi.Extensions;
+using Forum.WebApi.Middlewares;
 using Forum.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,43 +66,6 @@ app.UseAuthorization();
 var api = app.MapGroup("api");
 
 api.MapEndpoints();
-
-api.MapGet("/auth/test", [Authorize] (HttpContext context) =>
-{
-    return context.User.Claims.Select(x => new { x.Type, x.Value });
-});
-
-api.MapGet("/auth/test2", (ForumDbContext context) =>
-{
-    return context.Users.ToList();
-});
-
-api.MapGet("/auth/test3", async (ForumDbContext context) =>
-{
-    var users = context.Users.ToList(); 
-    context.Users.RemoveRange(users);
-    await context.SaveChangesAsync();
-});
-
-api.MapGet("/auth/test4", () => 
-{
-    throw new ApiException(404, new List<ApiError> {
-        new("test error1"),
-        new("test error2"),
-        new("test error3"),
-        new("test error4")
-    });
-});
-
-api.MapGet("/auth/test5", () => 
-{
-    throw new Exception("test error");
-});
-
-api.MapGet("/auth/logout", async (SignInManager<User> signInManager) =>
-{
-    await signInManager.SignOutAsync();
-});
 
 app.Run();
 

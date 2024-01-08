@@ -32,12 +32,10 @@ public class WebAppFactory<TEntryPoint> : WebApplicationFactory<Program> where T
             });
 
             var sp = services.BuildServiceProvider();
-            using (var scope = sp.CreateScope())
-            using (var appContext = scope.ServiceProvider.GetRequiredService<ForumDbContext>())
-            {
-                appContext.Database.EnsureDeleted();
-                appContext.Database.EnsureCreated();
-            }
+            using var scope = sp.CreateScope();
+            using var appContext = scope.ServiceProvider.GetRequiredService<ForumDbContext>();
+            appContext.Database.EnsureDeleted();
+            appContext.Database.EnsureCreated();
         });
     }
 }

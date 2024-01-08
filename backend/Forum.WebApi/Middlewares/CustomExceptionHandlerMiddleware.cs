@@ -1,6 +1,6 @@
 ﻿using Forum.Common;
 
-namespace Forum.WebApi;
+namespace Forum.WebApi.Middlewares;
 
 public class CustomExceptionHandlerMiddleware(RequestDelegate next)
 {
@@ -21,7 +21,7 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate next)
     public async Task HandleExceptionAsync(Exception exception, HttpContext context)
     {
         int status = 500;
-        IEnumerable<string> errors = [exception.Message];
+        IEnumerable<string> errors = ["Internal server errror"];
 
         switch (exception)
         {

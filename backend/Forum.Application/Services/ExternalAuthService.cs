@@ -31,31 +31,30 @@ public class ExternalAuthService(
             return Error.Unauthorized(description: "external login failed");
 
         var result = await _signInManager.ExternalLoginSignInAsync(
-            info!.LoginProvider, info.ProviderKey, false, true);
+            info.LoginProvider, info.ProviderKey, false, true);
 
-        if (!result.Succeeded)
+        if (result.Succeeded)
+            return Guid.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        
+        var user = new User
         {
-            var user = new User
-            {
-                UserName = info.Principal.FindFirstValue(ClaimTypes.Name),
-                Email = info.Principal.FindFirstValue(ClaimTypes.Email),
-                JoinedAt = DateTime.UtcNow
-            };
+            UserName = info.Principal.FindFirstValue(ClaimTypes.Name),
+            Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+            JoinedAt = DateTime.UtcNow
+        };
             
-            await _signInManager.UserManager.CreateAsync(user);
+        await _signInManager.UserManager.CreateAsync(user);
 
-            var userResult = await _signInManager.UserManager.AddLoginAsync(user, info);
+        var userResult = await _signInManager.UserManager.AddLoginAsync(user, info);
         
-            if(!userResult.Succeeded)
-                return Error.Unauthorized(description: "user creating failed");
+        if(!userResult.Succeeded)
+            return Error.Unauthorized(description: "user creating failed");
 
-            await _signInManager.UserManager.AddClaimAsync(user, info.Principal.FindFirst("picture")!);
+        await _signInManager.UserManager.AddClaimAsync(user, info.Principal.FindFirst("picture")!);
 
-            await _signInManager.SignInAsync(user, isPersistent: false);
+        await _signInManager.SignInAsync(user, isPersistent: false);
 
-            return user.Id;
-        }
-        
-        return Guid.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        return user.Id;
+
     }
 }

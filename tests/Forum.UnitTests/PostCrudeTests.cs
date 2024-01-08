@@ -1,6 +1,5 @@
 using ErrorOr;
 using FluentAssertions;
-using Forum.Application;
 using Forum.Application.Commands.Post;
 using Forum.Application.Commands.Post.Models;
 using Forum.Domain.Entities;
@@ -90,7 +89,7 @@ public class PostCrudeTests
     [Fact]
     public async Task GetPostErrorTest()
     {
-        var post = await CreatePost(_forumDbContext, _userid);
+        await CreatePost(_forumDbContext, _userid);
 
         var handler = new GetPostRequestHandler(_forumDbContext);
         var response = await handler.Handle(new() 

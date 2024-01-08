@@ -81,7 +81,7 @@ public class CommentCrudeTests
     public async Task GetCommentErrorTest()
     {
         var post = await PostCrudeTests.CreatePost(_forumDbContext, _userid);
-        var comment = await CreateComment(_forumDbContext, post.Value.Id, _userid);
+        await CreateComment(_forumDbContext, post.Value.Id, _userid);
 
         var handler = new GetCommentRequestHandler(_forumDbContext);
 
@@ -108,11 +108,11 @@ public class CommentCrudeTests
         var post = await PostCrudeTests.CreatePost(_forumDbContext, _userid);
         
         var comment1 = await CreateComment(_forumDbContext, post.Value.Id, _userid);
-        var comment21 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment1.Value.Id);
+        await CreateComment(_forumDbContext, post.Value.Id, _userid, comment1.Value.Id);
         var comment22 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment1.Value.Id);
         var comment3 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment22.Value.Id);
-        var comment4 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment3.Value.Id);
-        var comment5 = await CreateComment(_forumDbContext, post.Value.Id, _userid);
+        await CreateComment(_forumDbContext, post.Value.Id, _userid, comment3.Value.Id);
+        await CreateComment(_forumDbContext, post.Value.Id, _userid);
 
         var handler = new GetAllCommentsRequestHandler(_forumDbContext);
 
@@ -137,10 +137,10 @@ public class CommentCrudeTests
         
         var comment1 = await CreateComment(_forumDbContext, post.Value.Id, _userid);
         var comment21 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment1.Value.Id);
-        var comment211 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment21.Value.Id);
-        var comment212 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment21.Value.Id);
-        var comment22 = await CreateComment(_forumDbContext, post.Value.Id, _userid, comment1.Value.Id);
-        var comment3 = await CreateComment(_forumDbContext, post.Value.Id, _userid);
+        await CreateComment(_forumDbContext, post.Value.Id, _userid, comment21.Value.Id);
+        await CreateComment(_forumDbContext, post.Value.Id, _userid, comment21.Value.Id);
+        await CreateComment(_forumDbContext, post.Value.Id, _userid, comment1.Value.Id);
+        await CreateComment(_forumDbContext, post.Value.Id, _userid);
 
         var handler = new GetRepliesRequestHandler(_forumDbContext);
 
