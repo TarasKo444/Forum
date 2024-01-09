@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Forum.IntegrationTests;
 
-public class WebAppFactory<TEntryPoint> : WebApplicationFactory<Program> where TEntryPoint : Program
+public class WebAppFactory : WebApplicationFactory<Program>
 {
     public static Guid UserId = Guid.NewGuid();
 
@@ -21,14 +21,14 @@ public class WebAppFactory<TEntryPoint> : WebApplicationFactory<Program> where T
 
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType ==
-                    typeof(DbContextOptions<ForumDbContext>));
+                     typeof(DbContextOptions<ForumDbContext>));
             
             if (descriptor != null)
                 services.Remove(descriptor);
 
             services.AddDbContext<ForumDbContext>(options =>
             {
-                options.UseInMemoryDatabase("InMemoryForumTest");
+                options.UseInMemoryDatabase("InMemoryForumTes");
             });
 
             var sp = services.BuildServiceProvider();

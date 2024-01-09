@@ -19,7 +19,7 @@ public class GetPostRequestHandler(ForumDbContext forumDbContext)
 
     public async ValueTask<ErrorOr<PostResponse>> Handle(GetPostRequest request, CancellationToken cancellationToken)
     {
-        var post = await _forumDbContext.Posts.FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
+        var post = await _forumDbContext.Posts.SingleOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
         
         if(post is null)
             return Error.NotFound(description: "post with given id not found");

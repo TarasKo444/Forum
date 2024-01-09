@@ -1,11 +1,8 @@
 using Forum.Domain.Entities;
 using Forum.Infrastructure;
 using Forum.Application;
-using Forum.WebApi;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Forum.Common;
 using Forum.WebApi.Extensions;
 using Forum.WebApi.Middlewares;
 using Forum.WebApi.Services;

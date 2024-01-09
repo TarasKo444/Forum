@@ -7,33 +7,37 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Forum.IntegrationTests;
 
-public static class BaseEndpointTests 
+public static class Shared 
 {
-    public static void Init()
+    public static ForumDbContext Init(IServiceScope scope)
     {
-        //TODO Make init;
+        var services = scope.ServiceProvider;
+        var dbContext = services.GetRequiredService<ForumDbContext>();
+        
+        dbContext.Database.EnsureDeleted();
+        dbContext.Database.EnsureCreated();
+
+        CreateUser(dbContext, scope);
+        
+        return dbContext;
     }
-    
+
     public static ForumDbContext GetDbContext(IServiceScope scope)
     {
         var services = scope.ServiceProvider;
         var dbContext = services.GetRequiredService<ForumDbContext>();
-
         return dbContext;
     }
     
-    public static Guid CreateUser(WebAppFactory<Program> factory)
+    public static Guid CreateUser(ForumDbContext dbContext, IServiceScope scope)
     {
         var user = new User
         {
-            Id = WebAppFactory<Program>.UserId,
+            Id = WebAppFactory.UserId,
             Email = "test@gmail.com",
             UserName = "test"
         };
-
-        using var scope = factory.Services.CreateScope();
-        var dbContext = GetDbContext(scope);
-
+        
         dbContext.Users.AddAsync(user);
         dbContext.SaveChanges();
 

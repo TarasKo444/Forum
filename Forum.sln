@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
+#
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forum.WebApi", "backend\Forum.WebApi\Forum.WebApi.csproj", "{ED1A744F-CDDF-482B-B74C-E1770534198C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forum.Common", "backend\Forum.Common\Forum.Common.csproj", "{F4C4F75D-8244-4506-8CCA-3742B4F23AE0}"
@@ -18,6 +18,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forum.UnitTests", "tests\Forum.UnitTests\Forum.UnitTests.csproj", "{5818DDAD-B2E7-44B7-9C62-201C3E158FDE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forum.IntegrationTests", "tests\Forum.IntegrationTests\Forum.IntegrationTests.csproj", "{772C56E1-5173-4908-BBEE-31A5C46BDCCC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "tests\IntegrationTests", "{37DCAC47-6B58-41D9-8F64-0B152965102A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forum.CommentEndpointTests", "tests\Forum.CommentEndpointTests\Forum.CommentEndpointTests.csproj", "{F39DB401-2717-4A59-A9CE-90D9546B6465}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forum.PostEndpointTests", "tests\Forum.PostEndpointTests\Forum.PostEndpointTests.csproj", "{F4D34854-14EA-4E36-9E50-8A0803759DE4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +59,14 @@ Global
 		{772C56E1-5173-4908-BBEE-31A5C46BDCCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{772C56E1-5173-4908-BBEE-31A5C46BDCCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{772C56E1-5173-4908-BBEE-31A5C46BDCCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F39DB401-2717-4A59-A9CE-90D9546B6465}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F39DB401-2717-4A59-A9CE-90D9546B6465}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F39DB401-2717-4A59-A9CE-90D9546B6465}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F39DB401-2717-4A59-A9CE-90D9546B6465}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4D34854-14EA-4E36-9E50-8A0803759DE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4D34854-14EA-4E36-9E50-8A0803759DE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4D34854-14EA-4E36-9E50-8A0803759DE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4D34854-14EA-4E36-9E50-8A0803759DE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ED1A744F-CDDF-482B-B74C-E1770534198C} = {19C9512A-BBB5-4488-B53D-0740CEC94FC8}
@@ -62,5 +76,8 @@ Global
 		{8CFEAE32-504D-4D5F-96D3-EBBF1E661E54} = {19C9512A-BBB5-4488-B53D-0740CEC94FC8}
 		{5818DDAD-B2E7-44B7-9C62-201C3E158FDE} = {4D482EBD-9068-46C8-897C-D438F9994CC2}
 		{772C56E1-5173-4908-BBEE-31A5C46BDCCC} = {4D482EBD-9068-46C8-897C-D438F9994CC2}
+		{37DCAC47-6B58-41D9-8F64-0B152965102A} = {4D482EBD-9068-46C8-897C-D438F9994CC2}
+		{F39DB401-2717-4A59-A9CE-90D9546B6465} = {37DCAC47-6B58-41D9-8F64-0B152965102A}
+		{F4D34854-14EA-4E36-9E50-8A0803759DE4} = {37DCAC47-6B58-41D9-8F64-0B152965102A}
 	EndGlobalSection
 EndGlobal

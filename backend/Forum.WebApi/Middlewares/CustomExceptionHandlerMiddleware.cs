@@ -32,6 +32,8 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate next)
                 break;
             }
         }
+
+        context.Response.StatusCode = status;
         
         await context.Response.WriteAsJsonAsync(new 
         {

@@ -15,7 +15,7 @@ public class DisableAuthenticationPolicyEvaluator : IPolicyEvaluator
         {
             new ClaimsIdentity(new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, WebAppFactory<Program>.UserId.ToString())
+                new Claim(ClaimTypes.NameIdentifier, WebAppFactory.UserId.ToString())
             })
         });
         var authenticationTicket = new AuthenticationTicket(principal, new AuthenticationProperties(), IdentityConstants.ApplicationScheme);

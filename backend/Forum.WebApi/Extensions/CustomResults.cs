@@ -9,28 +9,24 @@ public static class CustomResults
     {
         return Results.Json(result.MatchFirst(
             value => value,
-            error =>
-            {
-                ThrowApiException(error);
-                throw new Exception();
-            }));
+            error => throw GetApiException(error)));
     }
 
-    public static void ThrowApiException(Error error)
+    public static ApiException GetApiException(Error error)
     {
-        switch(error.Type)
+        return error.Type switch
         {
-            case ErrorType.Unauthorized : throw new ApiException(401, error.Description);
-            case ErrorType.NotFound : throw new ApiException(404, error.Description);
-            default : throw new ApiException(500, error.Description);
-        }
+            ErrorType.Unauthorized => new ApiException(401, error.Description),
+            ErrorType.NotFound => new ApiException(404, error.Description),
+            _ => new ApiException(500, error.Description)
+        };
     }
     
     public static IResult Ok<T>(ErrorOr<T> result)
     {
         if (result.IsError)
         {
-            ThrowApiException(result.FirstError);
+            throw GetApiException(result.FirstError);
         }
 
         return Results.Ok();
