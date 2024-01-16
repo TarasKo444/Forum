@@ -9,7 +9,7 @@ namespace Forum.IntegrationTests;
 
 public static class Shared 
 {
-    public static ForumDbContext Init(IServiceScope scope)
+    public static void Init(IServiceScope scope)
     {
         var services = scope.ServiceProvider;
         var dbContext = services.GetRequiredService<ForumDbContext>();
@@ -18,8 +18,6 @@ public static class Shared
         dbContext.Database.EnsureCreated();
 
         CreateUser(dbContext, scope);
-        
-        return dbContext;
     }
 
     public static ForumDbContext GetDbContext(IServiceScope scope)

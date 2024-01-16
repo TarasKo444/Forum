@@ -18,7 +18,7 @@ public class CommentEndpointsTests : IClassFixture<WebAppFactory>
         _client = factory.CreateClient();
         _factory = factory;
         using var scope = _factory.Services.CreateScope();
-        var dbContext = Shared.Init(scope);
+        Shared.Init(scope);
     }
 
     [Fact]

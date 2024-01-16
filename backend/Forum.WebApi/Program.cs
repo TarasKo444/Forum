@@ -36,6 +36,7 @@ builder.Services.AddAuthentication()
         options.ClientId = builder.Configuration["GoogleOAuthOptions:ClientId"]!;
         options.ClientSecret = builder.Configuration["GoogleOAuthOptions:ClientSecret"]!;
         options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.SaveTokens = true;
         options.ClaimActions.MapJsonKey("picture", "picture");
     });
 
@@ -66,4 +67,4 @@ api.MapEndpoints();
 
 app.Run();
 
-public partial class Program { }
+public partial class Program;

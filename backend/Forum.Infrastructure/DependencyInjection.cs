@@ -10,7 +10,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<ForumDbContext>(options =>
         {
-            options.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
         });
 
         return services;
